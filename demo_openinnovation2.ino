@@ -1034,9 +1034,9 @@ void webSerialJSON() {
         //------------------WRITING-----------------
         serializeJson(jsonDoc["payload"], eeprom);
         eeprom.flush();
-//        Serial.write(STX);
-//        Serial.print("saved");
-//        Serial.write(ETX);
+        //        Serial.write(STX);
+        //        Serial.print("saved");
+        //        Serial.write(ETX);
         ESP.restart();
       } else if (command) {
         Serial.write(STX);
@@ -1092,15 +1092,24 @@ void setup() {
 
   while (!Serial) delay(10);     // will pause Zero, Leonardo, etc until serial console opens
 
-  if (!jsonDoc.isNull() && (WiFi.status() == WL_CONNECTED)) {
-    //    Serial.println("WiFi connected");
+  if (!jsonDoc.isNull()) {
+    if ( WiFi.status() != WL_CONNECTED) {
+      while ( WiFi.status() != WL_CONNECTED) {
+        unsigned long currentTime = millis();
+        webSerialJSON();
+        if (currentTime - previousTime >= reconnectInterval) {
+          WiFi.begin(ssid.c_str(), password.c_str());
+          previousTime = currentTime;
+        }
+      }
+    }
   } else {
-    //    Serial.println("Cannot Connect to Wifi");
     while (true) {
       WiFi.disconnect();
       webSerialJSON();
     }
   }
+  
   client.setServer(mqtt_server.c_str(), mqtt_port.toInt());
   client.setCallback(callback);
   timeClient.begin();
