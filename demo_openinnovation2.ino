@@ -1034,10 +1034,11 @@ void webSerialJSON() {
         //------------------WRITING-----------------
         serializeJson(jsonDoc["payload"], eeprom);
         eeprom.flush();
+        ESP.restart();
         //        Serial.write(STX);
         //        Serial.print("saved");
         //        Serial.write(ETX);
-        ESP.restart();
+
       } else if (command) {
         Serial.write(STX);
         Serial.print(command);
@@ -1109,7 +1110,7 @@ void setup() {
       webSerialJSON();
     }
   }
-  
+
   client.setServer(mqtt_server.c_str(), mqtt_port.toInt());
   client.setCallback(callback);
   timeClient.begin();
@@ -1133,9 +1134,9 @@ void loop() {
   //  float humidity = sht31.readHumidity();
   //  float lux = lightMeter.readLightLevel() / 1000; //(KLux)
 
-  float temp = 1;
-  float humidity = 2;
-  float lux = 3;
+  float temp = random(10, 100);
+  float humidity = random(10, 20);
+  float lux = random(10, 20);
 
   timeClient.update();
   sensorValue = analogRead(analogInPin);
